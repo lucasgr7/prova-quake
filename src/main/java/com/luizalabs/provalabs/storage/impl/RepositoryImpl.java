@@ -20,7 +20,7 @@ public class RepositoryImpl implements Repository {
 	}
 	
 	@Override
-	public List<Game> getAll() {
+	public List<Game> getAllGames() {
 		return RepositoryImpl.games;
 	}
 

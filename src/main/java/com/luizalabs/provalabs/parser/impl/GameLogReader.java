@@ -6,12 +6,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.luizalabs.provalabs.parser.LogReader;
@@ -25,23 +22,17 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class GameLogReader implements LogReader {
 
-	@Value("${game.log_file}")
-	private String FILE_PATH;
-
 	@Autowired
-	private Repository repository;
+	private Repository repo;
 
 	private static Game GameInAnalisis;
 
 	private final String USER_WORLD_GAME = "<world>", LOG_START_DEAD_PLAYER = "killed", LOG_END_DEAD_PLAYER = "by";
-	private final String LOG_START_GAME = "InitGame:", LOG_PLAYER_INFO_CHANGE = "ClientUserinfoChanged", LOG_PLAYER_KILL = "Kill:";
+	private final String LOG_START_GAME = "InitGame:", LOG_PLAYER_INFO_CHANGE = "ClientUserinfoChanged", LOG_PLAYER_KILL = "Kill:", LOG_FINISH_GAME = "-----------";
 
 	@Override
-	public void execute() throws FileNotFoundException, IOException {
-		if (FILE_PATH.isEmpty()) {
-			FILE_PATH = new File("games.log").getAbsolutePath();
-		}
-		BufferedReader br = new BufferedReader(new FileReader(FILE_PATH));
+	public void parse(String filePath) throws FileNotFoundException, IOException {
+		BufferedReader br = new BufferedReader(new FileReader(filePath));
 		try {
 			String line = br.readLine();
 			while (line != null) {
@@ -58,15 +49,24 @@ public class GameLogReader implements LogReader {
 
 	private void analyseLogLine(String line) throws Exception {
 		if (line.contains(LOG_START_GAME)) {
-			CreateNewGame();
+			createNewGame();
 		} else if(line.contains(LOG_PLAYER_INFO_CHANGE)) {
-			AddPlayer(line);
+			addPlayer(line);
 		} else if (line.contains(LOG_PLAYER_KILL)) {
-			AddKill(line);
+			addKill(line);
+		} else if (line.contains(LOG_FINISH_GAME)) {
+			finishGame(line);
 		}
 	}
 
-	private void AddPlayer(String line) {
+	private void finishGame(String line) throws Exception {
+		if (GameLogReader.GameInAnalisis != null) {
+			repo.save(GameLogReader.GameInAnalisis);
+			GameLogReader.GameInAnalisis = null;
+		}
+	}
+
+	private void addPlayer(String line) {
 		Game game = GameLogReader.GameInAnalisis;
 
 		String[] bruteLogWords = line.split(" n\\\\");
@@ -85,7 +85,7 @@ public class GameLogReader implements LogReader {
 		return player;
 	}
 
-	private void AddKill(String line) {
+	private void addKill(String line) {
 		Game game = GameLogReader.GameInAnalisis;
 		game.setTotalKills(GameLogReader.GameInAnalisis.getTotalKills() + 1);
 
@@ -103,9 +103,9 @@ public class GameLogReader implements LogReader {
 	private Player getPlayer(String line, Game game, EnumPlayer selectedPlayer) {
 
 		String[] bruteLogWords = line.split(":");
-		String[] killedLog = bruteLogWords[3].split("killed");
+		String[] killedLog = bruteLogWords[3].split(LOG_START_DEAD_PLAYER);
 		String killerPlayerName = killedLog[0].trim();
-		String deadPlayerName = killedLog[1].split("by")[0].trim();
+		String deadPlayerName = killedLog[1].split(LOG_END_DEAD_PLAYER)[0].trim();
 
 		if (selectedPlayer == EnumPlayer.killer) {
 			Optional<Player> killer = findPlayer(killerPlayerName);
@@ -116,13 +116,9 @@ public class GameLogReader implements LogReader {
 		}
 	}
 
-	private void CreateNewGame() throws Exception {
-		if (GameLogReader.GameInAnalisis != null) {
-			repository.save(GameLogReader.GameInAnalisis);
-		}
-		GameLogReader.GameInAnalisis = Game.builder().id(repository.getAll().size() + 1).players(new ArrayList<Player>())
+	private void createNewGame() {
+		GameLogReader.GameInAnalisis = Game.builder().id(repo.getAllGames().size() + 1).players(new ArrayList<Player>())
 				.build();
-
 	}
 
 	public enum EnumPlayer {

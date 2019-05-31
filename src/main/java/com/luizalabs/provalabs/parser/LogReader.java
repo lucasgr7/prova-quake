@@ -5,5 +5,5 @@ import java.io.IOException;
 
 public interface LogReader {
 
-	public void execute() throws FileNotFoundException, IOException;
+	public void parse(String filePath) throws FileNotFoundException, IOException;
 }
