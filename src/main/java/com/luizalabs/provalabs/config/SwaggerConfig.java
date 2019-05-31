@@ -1,4 +1,4 @@
-package com.luizalabs.provalabs.api.config;
+package com.luizalabs.provalabs.config;
 
 import java.util.Collections;
 

@@ -1,4 +1,4 @@
-package com.luizalabs.provalabs.events;
+package com.luizalabs.provalabs.config;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

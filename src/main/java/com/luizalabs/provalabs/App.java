@@ -4,7 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
 
-import com.luizalabs.provalabs.api.config.SwaggerConfig;
+import com.luizalabs.provalabs.config.SwaggerConfig;
 
 @SpringBootApplication
 @Import(SwaggerConfig.class)

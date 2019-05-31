@@ -1,4 +1,4 @@
-package com.luizalabs.provalabs.api.lib;
+package com.luizalabs.provalabs.api.models.base;
 
 import lombok.Builder;
 import lombok.Getter;
