@@ -1,13 +1,26 @@
 package com.luizalabs.provalabs.api.models.base;
 
-import org.springframework.http.ResponseEntity;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.List;
 
-import lombok.Builder;
+import com.luizalabs.provalabs.storage.entity.Game;
+
 import lombok.Data;
 
 @Data
-@Builder
 public class ResponseList {
 	private Meta meta;
-	private ResponseEntity<?> records;
+	private List<Game> records;
+	
+	public ResponseList() {
+		this.meta = new Meta();
+		try {
+			this.meta.setHostname(InetAddress.getLocalHost().getHostName());
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 }

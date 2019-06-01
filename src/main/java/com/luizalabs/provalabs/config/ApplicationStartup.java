@@ -10,16 +10,15 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
-import com.luizalabs.provalabs.parser.LogReader;
+import com.luizalabs.provalabs.parser.QuakeLogParser;
 
 @Component
 public class ApplicationStartup implements ApplicationListener<ApplicationReadyEvent> {
 
-	@Value("${log.file_path}")
 	private String filepath;
 	
 	@Autowired
-	private LogReader logReader;
+	private QuakeLogParser logReader;
 	
 	@Override
 	public void onApplicationEvent(ApplicationReadyEvent event) {

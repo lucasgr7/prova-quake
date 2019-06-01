@@ -8,13 +8,15 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.luizalabs.provalabs.parser.impl.GameLogReader;
+import com.luizalabs.provalabs.parser.impl.LogReaderImpl;
+import com.luizalabs.provalabs.parser.impl.QuakeLogParserImpl;
 import com.luizalabs.provalabs.storage.Repository;
 import com.luizalabs.provalabs.storage.entity.Game;
 import com.luizalabs.provalabs.storage.impl.RepositoryImpl;
@@ -22,25 +24,25 @@ import com.luizalabs.provalabs.storage.impl.RepositoryImpl;
 import lombok.extern.slf4j.Slf4j;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {GameLogReader.class, RepositoryImpl.class})
+@ContextConfiguration(classes = {QuakeLogParserImpl.class, RepositoryImpl.class, LogReaderImpl.class})
 @Slf4j
-public class TestParserLogFull {
+public class TestLogData {
 
 	@Autowired
-	LogReader logReader;
+	QuakeLogParser logReader;
 	
 	@Autowired
 	Repository repo;
+
+	Integer countGames = 0;
+	Integer[] gamesCountKills = new Integer[50];
+	String FILE_PATH = new File("games.log").getAbsolutePath();
 	
 	private final String LOG_START_GAME = "InitGame:", LOG_KILL = "Kill:";
+	
+	@Before
+	public void init() {
 
-	@Test
-	public void test_full_log_read() {
-		String FILE_PATH = new File("games.log").getAbsolutePath();
-		
-		Integer countGames = 0;
-		Integer[] gamesCountKills = new Integer[50];
-		
 		BufferedReader br;
 		try {
 			br = new BufferedReader(new FileReader(FILE_PATH));
@@ -58,7 +60,15 @@ public class TestParserLogFull {
 				log.info(line);
 			}
 			
-			//Execute the logreader main method
+		} catch (Exception e) {
+			fail();
+		}
+	}
+
+	@Test
+	public void test_extraction_data_from_log() {
+		//Execute the logreader main method
+		try {
 			logReader.parse(FILE_PATH);
 		} catch (Exception e) {
 			fail();

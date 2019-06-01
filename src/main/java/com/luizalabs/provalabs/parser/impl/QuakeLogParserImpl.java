@@ -1,9 +1,6 @@
 package com.luizalabs.provalabs.parser.impl;
 
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -12,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.luizalabs.provalabs.parser.LogReader;
+import com.luizalabs.provalabs.parser.QuakeLogParser;
 import com.luizalabs.provalabs.storage.Repository;
 import com.luizalabs.provalabs.storage.entity.Game;
 import com.luizalabs.provalabs.storage.entity.Player;
@@ -20,30 +18,33 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-public class GameLogReader implements LogReader {
+public class QuakeLogParserImpl implements QuakeLogParser {
 
 	@Autowired
 	private Repository repo;
+	
+	@Autowired
+	private LogReader fileReader;
 
 	private static Game GameInAnalisis;
 
-	private final String USER_WORLD_GAME = "<world>", LOG_START_DEAD_PLAYER = "killed", LOG_END_DEAD_PLAYER = "by";
+	private final String USER_WORLD_GAME = "<world>", LOG_START_DEAD_PLAYER = "", LOG_END_DEAD_PLAYER = "by";
 	private final String LOG_START_GAME = "InitGame:", LOG_PLAYER_INFO_CHANGE = "ClientUserinfoChanged", LOG_PLAYER_KILL = "Kill:", LOG_FINISH_GAME = "-----------";
 
 	@Override
 	public void parse(String filePath) throws FileNotFoundException, IOException {
-		BufferedReader br = new BufferedReader(new FileReader(filePath));
+		fileReader.setFile(filePath);
 		try {
-			String line = br.readLine();
+			String line = fileReader.nextLine();
 			while (line != null) {
 				log.info(line);
 				analyseLogLine(line);
-				line = br.readLine();
+				line = fileReader.nextLine();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			br.close();
+			fileReader.close();
 		}
 	}
 
@@ -60,14 +61,14 @@ public class GameLogReader implements LogReader {
 	}
 
 	private void finishGame(String line) throws Exception {
-		if (GameLogReader.GameInAnalisis != null) {
-			repo.save(GameLogReader.GameInAnalisis);
-			GameLogReader.GameInAnalisis = null;
+		if (QuakeLogParserImpl.GameInAnalisis != null) {
+			repo.save(QuakeLogParserImpl.GameInAnalisis);
+			QuakeLogParserImpl.GameInAnalisis = null;
 		}
 	}
 
 	private void addPlayer(String line) {
-		Game game = GameLogReader.GameInAnalisis;
+		Game game = QuakeLogParserImpl.GameInAnalisis;
 
 		String[] bruteLogWords = line.split(" n\\\\");
 		String playerName = bruteLogWords[1].split("\\\\t")[0];
@@ -79,20 +80,14 @@ public class GameLogReader implements LogReader {
 		}
 	}
 	
-	private Optional<Player> findPlayer(final String name) {
-		Optional<Player> player = GameLogReader.GameInAnalisis.getPlayers().stream().filter(x -> x.getName().equalsIgnoreCase(name))
-				.findAny();
-		return player;
-	}
+	private void addKill(String line) throws Exception {
+		Game game = QuakeLogParserImpl.GameInAnalisis;
+		game.setTotalKills(QuakeLogParserImpl.GameInAnalisis.getTotalKills() + 1);
 
-	private void addKill(String line) {
-		Game game = GameLogReader.GameInAnalisis;
-		game.setTotalKills(GameLogReader.GameInAnalisis.getTotalKills() + 1);
-
-		Player killer = getPlayer(line, game, EnumPlayer.killer);
+		Player killer = getPlayerFromLog(line, game, EnumPlayer.killer);
 
 		if (USER_WORLD_GAME.equalsIgnoreCase(killer.getName())) {
-			Player dead = getPlayer(line, game, EnumPlayer.dead);
+			Player dead = getPlayerFromLog(line, game, EnumPlayer.dead);
 			dead.removeKill();
 			game.savePlayer(dead);
 		}
@@ -100,8 +95,10 @@ public class GameLogReader implements LogReader {
 		game.savePlayer(killer);
 	}
 
-	private Player getPlayer(String line, Game game, EnumPlayer selectedPlayer) {
-
+	private Player getPlayerFromLog(String line, Game game, EnumPlayer selectedPlayer) {
+		
+		line = escapeCustomChars(line);
+		
 		String[] bruteLogWords = line.split(":");
 		String[] killedLog = bruteLogWords[3].split(LOG_START_DEAD_PLAYER);
 		String killerPlayerName = killedLog[0].trim();
@@ -115,9 +112,24 @@ public class GameLogReader implements LogReader {
 			return dead.orElse(new Player(deadPlayerName));
 		}
 	}
+	
+	private String escapeCustomChars(String line) {
+		//escape ':' if the player uses as nickname
+		if(line.length() - line.replace(":", "").length() > 3) {
+			
+		}
+		return line;
+	}
 
+	private Optional<Player> findPlayer(final String name) {
+		Optional<Player> player = QuakeLogParserImpl.GameInAnalisis.getPlayers().stream().filter(x -> x.getName().equalsIgnoreCase(name))
+				.findAny();
+		return player;
+	}
+
+	
 	private void createNewGame() {
-		GameLogReader.GameInAnalisis = Game.builder().id(repo.getAllGames().size() + 1).players(new ArrayList<Player>())
+		QuakeLogParserImpl.GameInAnalisis = Game.builder().id(repo.getAllGames().size() + 1).players(new ArrayList<Player>())
 				.build();
 	}
 

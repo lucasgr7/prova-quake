@@ -1,10 +1,8 @@
 package com.luizalabs.provalabs.api.models.base;
 
-import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 
-@Builder
-@Getter
+@Data
 public class Meta {
 	private int totalRecords;
 	private int recordsCount;
