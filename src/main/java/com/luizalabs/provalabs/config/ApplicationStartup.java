@@ -5,12 +5,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
-import com.luizalabs.provalabs.parser.QuakeLogParser;
+import com.luizalabs.provalabs.service.QuakeLogParser;
 
 @Component
 public class ApplicationStartup implements ApplicationListener<ApplicationReadyEvent> {

@@ -1,4 +1,4 @@
-package com.luizalabs.provalabs.parser.impl;
+package com.luizalabs.provalabs.service.impl;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -8,9 +8,9 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.luizalabs.provalabs.parser.LogReader;
-import com.luizalabs.provalabs.parser.QuakeLogParser;
-import com.luizalabs.provalabs.storage.Repository;
+import com.luizalabs.provalabs.service.LogReader;
+import com.luizalabs.provalabs.service.QuakeLogParser;
+import com.luizalabs.provalabs.storage.GamesRepository;
 import com.luizalabs.provalabs.storage.entity.Game;
 import com.luizalabs.provalabs.storage.entity.Player;
 
@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 public class QuakeLogParserImpl implements QuakeLogParser {
 
 	@Autowired
-	private Repository repo;
+	private GamesRepository repo;
 	
 	@Autowired
 	private LogReader fileReader;
@@ -129,7 +129,7 @@ public class QuakeLogParserImpl implements QuakeLogParser {
 
 	
 	private void createNewGame() {
-		QuakeLogParserImpl.GameInAnalisis = Game.builder().id(repo.getAllGames().size() + 1).players(new ArrayList<Player>())
+		QuakeLogParserImpl.GameInAnalisis = Game.builder().id(repo.count() + 1).players(new ArrayList<Player>())
 				.build();
 	}
 

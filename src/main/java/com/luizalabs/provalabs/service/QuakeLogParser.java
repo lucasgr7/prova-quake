@@ -1,4 +1,4 @@
-package com.luizalabs.provalabs.parser;
+package com.luizalabs.provalabs.service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

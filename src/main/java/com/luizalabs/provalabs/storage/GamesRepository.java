@@ -4,11 +4,14 @@ import java.util.List;
 
 import com.luizalabs.provalabs.storage.entity.Game;
 
-public interface Repository {
+public interface GamesRepository {
 
-	List<Game> getAllGames();
+	List<Game> findAll(int offset, int limit);
+	List<Game> findAll();
+	int count();
+	
 	Game getById(int id);
-	Game getByPlayerName(String player);
+	List<Game> findByPlayerName(String player, int offset, int limit);
 	void save(Game game) throws Exception;
 	
 }

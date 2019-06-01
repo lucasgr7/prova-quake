@@ -20,15 +20,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.luizalabs.provalabs.parser.impl.LogReaderImpl;
-import com.luizalabs.provalabs.parser.impl.QuakeLogParserImpl;
-import com.luizalabs.provalabs.storage.Repository;
+import com.luizalabs.provalabs.service.LogReader;
+import com.luizalabs.provalabs.service.impl.LogReaderImpl;
+import com.luizalabs.provalabs.service.impl.QuakeLogParserImpl;
+import com.luizalabs.provalabs.storage.GamesRepository;
 import com.luizalabs.provalabs.storage.entity.Game;
 import com.luizalabs.provalabs.storage.entity.Player;
-import com.luizalabs.provalabs.storage.impl.RepositoryImpl;
+import com.luizalabs.provalabs.storage.impl.GamesRepositoryImpl;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {QuakeLogParserImpl.class, RepositoryImpl.class, LogReaderImpl.class})
+@ContextConfiguration(classes = {QuakeLogParserImpl.class, GamesRepositoryImpl.class, LogReaderImpl.class})
 public class TestParserResilience {
 	
 	@Mock
@@ -39,14 +40,14 @@ public class TestParserResilience {
 	QuakeLogParserImpl quakeLogReader;
 	
 	@Autowired
-	Repository repo;
+	GamesRepository repo;
 	
 	String PLAYER_ONE = "killed", PLAYER_TWO = "Kill:", PLAYER_THREE = "by someone", PLAYER_FOUR = ":";
 	
 	@Before
 	public void init() {
 
-	       MockitoAnnotations.initMocks(this);
+	    MockitoAnnotations.initMocks(this);
 		String[] mockedLog = new String[] {
 				"  0:00 ------------------------------------------------------------\r\n", 
 				"  0:00 InitGame: ", 
@@ -94,8 +95,8 @@ public class TestParserResilience {
 		} catch (Exception e) {
 			fail();
 		}
-		assertTrue("Expected to have 1 game", repo.getAllGames().size() == 1);
-		Game game = repo.getAllGames().get(0);
+		assertTrue("Expected to have 1 game", repo.findAll().size() == 1);
+		Game game = repo.findAll().get(0);
 		assertNotNull("Game is null", game);
 		assertTrue("Expected to have 4 players", game.getPlayers().size() == 4);
 		assertTrue("Player isn't registered: " +PLAYER_ONE, game.getPlayers().stream().anyMatch(x -> x.getName().equalsIgnoreCase(PLAYER_ONE)));

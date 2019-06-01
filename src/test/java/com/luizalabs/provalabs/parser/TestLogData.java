@@ -15,16 +15,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.luizalabs.provalabs.parser.impl.LogReaderImpl;
-import com.luizalabs.provalabs.parser.impl.QuakeLogParserImpl;
-import com.luizalabs.provalabs.storage.Repository;
+import com.luizalabs.provalabs.service.QuakeLogParser;
+import com.luizalabs.provalabs.service.impl.LogReaderImpl;
+import com.luizalabs.provalabs.service.impl.QuakeLogParserImpl;
+import com.luizalabs.provalabs.storage.GamesRepository;
 import com.luizalabs.provalabs.storage.entity.Game;
-import com.luizalabs.provalabs.storage.impl.RepositoryImpl;
+import com.luizalabs.provalabs.storage.impl.GamesRepositoryImpl;
 
 import lombok.extern.slf4j.Slf4j;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {QuakeLogParserImpl.class, RepositoryImpl.class, LogReaderImpl.class})
+@ContextConfiguration(classes = {QuakeLogParserImpl.class, GamesRepositoryImpl.class, LogReaderImpl.class})
 @Slf4j
 public class TestLogData {
 
@@ -32,7 +33,7 @@ public class TestLogData {
 	QuakeLogParser logReader;
 	
 	@Autowired
-	Repository repo;
+	GamesRepository repo;
 
 	Integer countGames = 0;
 	Integer[] gamesCountKills = new Integer[50];
@@ -73,7 +74,7 @@ public class TestLogData {
 		} catch (Exception e) {
 			fail();
 		}
-		List<Game> savedGames = repo.getAllGames();
+		List<Game> savedGames = repo.findAll();
 		assertTrue("The games in repository is null",  savedGames!= null);
 		assertTrue("The games list is empty", !savedGames.isEmpty());
 		assertTrue("There isn't the same count of games as expected", savedGames.size() == countGames);

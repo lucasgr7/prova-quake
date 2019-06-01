@@ -1,4 +1,4 @@
-package com.luizalabs.provalabs.parser.impl;
+package com.luizalabs.provalabs.service.impl;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -7,7 +7,7 @@ import java.io.IOException;
 
 import org.springframework.stereotype.Service;
 
-import com.luizalabs.provalabs.parser.LogReader;
+import com.luizalabs.provalabs.service.LogReader;
 
 @Service
 public class LogReaderImpl implements LogReader{
