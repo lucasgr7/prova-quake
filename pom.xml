@@ -19,6 +19,10 @@
 		<java.version>11</java.version>
 		<sonar.coverage.exclusions>
 			**/provalabs/config/*.*,
+			**/provalabs/storage/entity/*.*,
+			**/provalabs/api/health/*.*,
+			**/models/*.*,
+			**/App.*,
 			**/lombok/*.*
 		</sonar.coverage.exclusions>
 		
