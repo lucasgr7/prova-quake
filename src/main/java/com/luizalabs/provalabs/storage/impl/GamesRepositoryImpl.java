@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.luizalabs.provalabs.config.CustomException;
 import com.luizalabs.provalabs.storage.GamesRepository;
 import com.luizalabs.provalabs.storage.entity.Game;
 
@@ -56,9 +57,9 @@ public class GamesRepositoryImpl implements GamesRepository {
 	}
 
 	@Override
-	public void save(Game game) throws Exception {
+	public void save(Game game) throws CustomException {
 		if(game == null || game.getId() <= 0) {
-			throw new Exception("Game is invalid for persist! Please validate");
+			throw new CustomException("Game is invalid for persist! Please validate");
 		}
 		Optional<Game> gamePersisted = games.stream().filter(x -> x.getId() == game.getId()).findFirst();
 		if(!gamePersisted.isPresent()) {

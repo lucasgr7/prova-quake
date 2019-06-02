@@ -1,6 +1,5 @@
 package com.luizalabs.provalabs.service.impl;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -8,6 +7,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.luizalabs.provalabs.config.CustomException;
 import com.luizalabs.provalabs.service.LogReader;
 import com.luizalabs.provalabs.service.QuakeLogParser;
 import com.luizalabs.provalabs.storage.GamesRepository;
@@ -26,16 +26,16 @@ public class QuakeLogParserImpl implements QuakeLogParser {
 	@Autowired
 	private LogReader fileReader;
 
-	private static Game GameInAnalisis;
+	private static Game gameState;
 
-	private final String USER_WORLD = "<world>";
-	private final String REGEX_PATTERN_END_GAME = "^.*\\d*:\\d*\\s(-*)$";
-	private final String REGEX_PATTERN_START_GAME = "^\\d*:\\d*\\sInitGame:.*$";
-	private final String REGEX_PATTERN_PLAYER_ENTERED = "^\\d*:\\d*\\sClientUserinfoChanged:\\s\\d.*";
-	private final String REGEX_PATTERN_KILL = "^\\d*:\\d*\\sKill:.*";
+	private static final String USER_WORLD = "<world>";
+	private static final String REGEX_PATTERN_END_GAME = "^.*\\d*:\\d*\\s(-*)$";
+	private static final String REGEX_PATTERN_START_GAME = "^\\d*:\\d*\\sInitGame:.*$";
+	private static final String REGEX_PATTERN_PLAYER_ENTERED = "^\\d*:\\d*\\sClientUserinfoChanged:\\s\\d.*";
+	private static final String REGEX_PATTERN_KILL = "^\\d*:\\d*\\sKill:.*";
 
 	@Override
-	public void parse(String filePath) throws FileNotFoundException, IOException, Exception {
+	public void parse(String filePath) throws IOException, CustomException {
 		fileReader.setFile(filePath);
 		try {
 			String line = fileReader.nextLine();
@@ -43,7 +43,7 @@ public class QuakeLogParserImpl implements QuakeLogParser {
 				analyseLogLine(line.trim());
 				line = fileReader.nextLine();
 			}
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			log.error(e.getMessage());
 			throw e;
 		} finally {
@@ -51,7 +51,7 @@ public class QuakeLogParserImpl implements QuakeLogParser {
 		}
 	}
 
-	private void analyseLogLine(String line) throws Exception {
+	private void analyseLogLine(String line) throws CustomException {
 		if (line.matches(REGEX_PATTERN_START_GAME)) {
 			createNewGame();
 		} else if (line.matches(REGEX_PATTERN_PLAYER_ENTERED)) {
@@ -63,16 +63,16 @@ public class QuakeLogParserImpl implements QuakeLogParser {
 		}
 	}
 
-	private void finishGame(String line) throws Exception {
-		if (QuakeLogParserImpl.GameInAnalisis != null) {
-			repo.save(QuakeLogParserImpl.GameInAnalisis);
-			QuakeLogParserImpl.GameInAnalisis = null;
+	private void finishGame(String line) throws CustomException {
+		if (QuakeLogParserImpl.gameState != null) {
+			repo.save(QuakeLogParserImpl.gameState);
+			QuakeLogParserImpl.gameState = null;
 			log.info("FINISH GAME: " + line);
 		}
 	}
 
 	private void addPlayer(String line) {
-		Game game = QuakeLogParserImpl.GameInAnalisis;
+		Game game = QuakeLogParserImpl.gameState;
 
 		String[] bruteLogWords = line.split(" n\\\\");
 		String playerName = bruteLogWords[1].split("\\\\t")[0];
@@ -84,9 +84,9 @@ public class QuakeLogParserImpl implements QuakeLogParser {
 		}
 	}
 
-	private void addKill(String line) throws Exception {
-		Game game = QuakeLogParserImpl.GameInAnalisis;
-		game.setTotalKills(QuakeLogParserImpl.GameInAnalisis.getTotalKills() + 1);
+	private void addKill(String line) throws CustomException {
+		Game game = QuakeLogParserImpl.gameState;
+		game.setTotalKills(QuakeLogParserImpl.gameState.getTotalKills() + 1);
 
 		Player killer = getPlayerFromLog(line, game, EnumPlayer.killer);
 
@@ -100,7 +100,7 @@ public class QuakeLogParserImpl implements QuakeLogParser {
 		}
 	}
 
-	private Player getPlayerFromLog(String line, Game game, EnumPlayer selectedPlayer) throws Exception {
+	private Player getPlayerFromLog(String line, Game game, EnumPlayer selectedPlayer) throws CustomException {
 		String[] bruteLogWords = line.split("^\\d*:\\d*\\sKill:\\s\\d*\\s\\d*\\s\\d*:\\s");
 		String[] killedLog = bruteLogWords[1].split("\\skilled\\s(?!=killed\\sby)");
 		String killerPlayerName = killedLog[0].trim();
@@ -116,19 +116,19 @@ public class QuakeLogParserImpl implements QuakeLogParser {
 			if (USER_WORLD.equalsIgnoreCase(playerNameFiltered)) {
 				return new Player(USER_WORLD);
 			}
-			throw new Exception("Player not recognized was present in kill log: " + playerNameFiltered);
+			throw new CustomException("Player not recognized was present in kill log: " + playerNameFiltered);
 		}
 		return player.get();
 	}
 
 	private Optional<Player> findPlayer(final String name) {
-		Optional<Player> player = QuakeLogParserImpl.GameInAnalisis.getPlayers().stream()
+		Optional<Player> player = QuakeLogParserImpl.gameState.getPlayers().stream()
 				.filter(x -> x.getName().equalsIgnoreCase(name)).findAny();
 		return player;
 	}
 
 	private void createNewGame() {
-		QuakeLogParserImpl.GameInAnalisis = Game.builder().id(repo.count() + (long) 1).players(new ArrayList<Player>())
+		QuakeLogParserImpl.gameState = Game.builder().id(repo.count() + (long) 1).players(new ArrayList<Player>())
 				.build();
 	}
 

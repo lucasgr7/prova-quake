@@ -3,6 +3,7 @@ package com.luizalabs.provalabs.storage;
 import java.util.List;
 import java.util.Optional;
 
+import com.luizalabs.provalabs.config.CustomException;
 import com.luizalabs.provalabs.storage.entity.Game;
 
 public interface GamesRepository {
@@ -13,7 +14,7 @@ public interface GamesRepository {
 	
 	Optional<Game> getById(int id);
 	List<Game> findByPlayerName(String player, Integer offset, Integer limit);
-	void save(Game game) throws Exception;
+	void save(Game game) throws CustomException;
 	void clearBase();
 	
 }
