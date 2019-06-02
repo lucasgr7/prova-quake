@@ -16,8 +16,7 @@ public class GamesRepositoryImpl implements GamesRepository {
 	private static List<Game> games;
 	
 	public GamesRepositoryImpl() {
-		// TODO Auto-generated constructor stub
-		GamesRepositoryImpl.games = new ArrayList<Game> ();
+		this.clearBase();
 	}
 	
 	@Override
@@ -27,12 +26,18 @@ public class GamesRepositoryImpl implements GamesRepository {
 	}
 	
 	@Override
-	public List<Game> findAll(int offset, int limit) {
+	public List<Game> findAll(Integer offset, Integer limit) {
 		List<Game> allGames = GamesRepositoryImpl.games;
 		return subList(offset, limit, allGames);
 	}
 
-	private List<Game> subList(int offset, int limit, List<Game> allGames) {
+	private List<Game> subList(Integer offset, Integer limit, List<Game> allGames) {
+		if(offset == null) {
+			offset = 0;
+		}
+		if(limit == null) {
+			limit = 50;
+		}
 		int max = allGames.size();
 		if(offset > max) {
 			return null;
@@ -65,7 +70,7 @@ public class GamesRepositoryImpl implements GamesRepository {
 	}
 
 	@Override
-	public List<Game> findByPlayerName(String playerName, int offset, int limit) {				
+	public List<Game> findByPlayerName(String playerName, Integer offset, Integer limit) {				
 		List<Game> filteredGames = GamesRepositoryImpl.games.stream()
 				.filter(x -> x.getPlayers().stream().anyMatch(player -> player.getName().toLowerCase().contains(playerName.toLowerCase()))).collect(Collectors.toList());
 		return subList(offset, limit, filteredGames);
@@ -77,6 +82,11 @@ public class GamesRepositoryImpl implements GamesRepository {
 			return 0;
 		}
 		return GamesRepositoryImpl.games.size();
+	}
+
+	@Override
+	public void clearBase() {
+		GamesRepositoryImpl.games = new ArrayList<Game>();
 	}
 
 

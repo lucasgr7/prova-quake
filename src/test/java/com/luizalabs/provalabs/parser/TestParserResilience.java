@@ -42,15 +42,18 @@ public class TestParserResilience {
 	@Autowired
 	GamesRepository repo;
 	
-	String PLAYER_ONE = "killed", PLAYER_TWO = "Kill:", PLAYER_THREE = "by someone", PLAYER_FOUR = ":";
+	String PLAYER_ONE = "killed", 
+			PLAYER_TWO = "Kill:", 
+			PLAYER_THREE = "22:30", 
+			PLAYER_FOUR = ":";
 	
 	@Before
 	public void init() {
-
+		repo.clearBase();
 	    MockitoAnnotations.initMocks(this);
 		String[] mockedLog = new String[] {
 				"  0:00 ------------------------------------------------------------\r\n", 
-				"  0:00 InitGame: ", 
+				"  0:00 InitGame: 12516516159", 
 				" 15:00 Exit: Timelimit hit.\r\n", 
 				" 20:38 ClientUserinfoChanged: 2 n\\"+PLAYER_ONE+"\\t\\0\\model\\uriel/zael\\hmodel\\uriel/zael\\g_redteam\\\\g_blueteam\\\\c1\\5\\c2\\5\\hc\\100\\w\\0\\l\\0\\tt\\0\\tl\\0\r\n", 
 				" 20:38 ClientBegin: 2\r\n", 
@@ -88,10 +91,10 @@ public class TestParserResilience {
 	}
 	
 	@Test
-	public void test_read_log() {
+	public void should_read_log_with_players_using_special_characters() {
 		
 		try {
-			quakeLogReader.parse("mockfile.log");
+			quakeLogReader.parse("MOCK");
 		} catch (Exception e) {
 			fail();
 		}
@@ -103,13 +106,14 @@ public class TestParserResilience {
 		assertTrue("Player isn't registered: " +PLAYER_TWO, game.getPlayers().stream().anyMatch(x -> x.getName().equalsIgnoreCase(PLAYER_TWO)));
 		assertTrue("Player isn't registered: " +PLAYER_THREE, game.getPlayers().stream().anyMatch(x -> x.getName().equalsIgnoreCase(PLAYER_THREE)));
 		assertTrue("Player isn't registered: " +PLAYER_FOUR, game.getPlayers().stream().anyMatch(x -> x.getName().equalsIgnoreCase(PLAYER_FOUR)));
-		Player playerOne = game.getPlayers().get(0);
-		Player playerTwo = game.getPlayers().get(1);
-		Player playerThree = game.getPlayers().get(2);
-		assertTrue("Player one has 2 kills", playerOne.getTotalKills() == 2);
-		assertTrue("Player two has 2 kills", playerTwo.getTotalKills() == 2);
-		assertTrue("Player three has 2 kills", playerThree.getTotalKills() == 2);
-		assertTrue("Player four has -1 kill", playerThree.getTotalKills() == -1);
+		Player player1 = game.getPlayers().get(0);
+		Player player2 = game.getPlayers().get(1);
+		Player player3 = game.getPlayers().get(2);
+		Player player4 = game.getPlayers().get(3);
+		assertTrue("Player one should have 2 kills", player1.getTotalKills() == 2);
+		assertTrue("Player two should have 2 kills", player2.getTotalKills() == 2);
+		assertTrue("Player three should have 2 kills", player3.getTotalKills() == 2);
+		assertTrue("Player four should have -1 kill", player4.getTotalKills() == -1);
 		
 		assertTrue("Total kills in game should be 6", game.getTotalKills() == 7);
 	}

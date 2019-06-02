@@ -14,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.luizalabs.provalabs.service.QuakeLogParser;
 import com.luizalabs.provalabs.service.impl.LogReaderImpl;
@@ -26,11 +27,12 @@ import lombok.extern.slf4j.Slf4j;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {QuakeLogParserImpl.class, GamesRepositoryImpl.class, LogReaderImpl.class})
+@WebAppConfiguration
 @Slf4j
 public class TestLogData {
 
 	@Autowired
-	QuakeLogParser logReader;
+	QuakeLogParser GameLogReader;
 	
 	@Autowired
 	GamesRepository repo;
@@ -43,7 +45,7 @@ public class TestLogData {
 	
 	@Before
 	public void init() {
-
+		repo.clearBase();
 		BufferedReader br;
 		try {
 			br = new BufferedReader(new FileReader(FILE_PATH));
@@ -67,17 +69,18 @@ public class TestLogData {
 	}
 
 	@Test
-	public void test_extraction_data_from_log() {
+	public void should_read_original_log_and_store_the_data() {
 		//Execute the logreader main method
 		try {
-			logReader.parse(FILE_PATH);
+			GameLogReader.parse(FILE_PATH);
 		} catch (Exception e) {
+			e.printStackTrace();
 			fail();
 		}
 		List<Game> savedGames = repo.findAll();
 		assertTrue("The games in repository is null",  savedGames!= null);
 		assertTrue("The games list is empty", !savedGames.isEmpty());
-		assertTrue("There isn't the same count of games as expected", savedGames.size() == countGames);
+		assertTrue(String.format("There isn't the same count of games (%s) as expected (%s)",savedGames.size(), countGames), savedGames.size() == countGames);
 
 		for(int x = 0; x < countGames; x++) {
 			int arrayPosition = x+1;

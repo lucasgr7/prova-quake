@@ -23,7 +23,7 @@ public class ResponseBase{
 		return this.errorMessages;
 	}
 	
-	public void setRecords(List<?> records, int offset, int limit, int totalRecords) {
+	public void setRecords(List<?> records, Integer offset, Integer limit, Integer totalRecords) {
 		this.records = records;
 		this.meta.setRecordsCount(records.size());
 		this.meta.setOffset(offset);

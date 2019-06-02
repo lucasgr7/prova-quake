@@ -1,8 +1,6 @@
 package com.luizalabs.provalabs.config;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -26,12 +24,8 @@ public class ApplicationStartup implements ApplicationListener<ApplicationReadyE
 		}
         try {
 			logReader.parse(filepath);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch(Exception ex) {
+			ex.printStackTrace();
 		}
 	}
 
