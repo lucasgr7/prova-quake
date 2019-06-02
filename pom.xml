@@ -1,18 +1,28 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.luizalabs</groupId>
-  <artifactId>provalabs</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <packaging>jar</packaging>
+	<groupId>com.luizalabs</groupId>
+	<artifactId>provalabs</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 
-  <name>provalabs</name>
-  <url>http://maven.apache.org</url>
+	<name>provalabs</name>
+	<url>http://maven.apache.org</url>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<jackson.version>2.9.0</jackson.version>
+		<java.version>11</java.version>
+		<sonar.coverage.exclusions>
+			**/provalabs/config/*.*,
+			**/lombok/*.*
+		</sonar.coverage.exclusions>
+		
+	</properties>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -51,9 +61,71 @@
 			<artifactId>lombok</artifactId>
 		</dependency>
 		<dependency>
-		    <groupId>org.apache.httpcomponents</groupId>
-		    <artifactId>httpclient</artifactId>
-		</dependency> 
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
 	</dependencies>
+
+<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<executable>true</executable>
+				</configuration>
+				<executions>
+					<execution>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>default-prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>jacoco-report</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+					<execution>
+					    <id>jacoco-check</id>
+					    <phase>test</phase>
+					    <goals>
+					        <goal>check</goal>
+					    </goals>
+					    <configuration>
+					        <rules>
+					            <rule implementation="org.jacoco.maven.RuleConfiguration">
+					                <element>BUNDLE</element>
+					                <limits>
+					                    <limit implementation="org.jacoco.report.check.Limit">
+					                        <counter>INSTRUCTION</counter>
+					                        <value>COVEREDRATIO</value>
+					                        <minimum>0.55</minimum>
+					                    </limit>
+					                </limits>
+					            </rule>
+					        </rules>
+					    </configuration>
+					</execution>
+				</executions>
+				<configuration>
+			        <excludes>
+			            <exclude>**/provalabs/config/*.*</exclude>
+			            <exclude>**/lombok/**/*.class</exclude>
+			        </excludes>
+			    </configuration>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>
