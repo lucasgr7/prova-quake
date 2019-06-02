@@ -7,14 +7,14 @@ import lombok.Data;
 
 @Data
 public class Meta {
-	@JsonInclude(content=Include.NON_NULL)
+	@JsonInclude(Include.NON_EMPTY)
 	private int totalRecords;
-	@JsonInclude(content=Include.NON_NULL)
+	@JsonInclude(Include.NON_EMPTY)
 	private int recordsCount;
-	@JsonInclude(content=Include.NON_NULL)
+	@JsonInclude(Include.NON_EMPTY)
 	private String hostname;
-	@JsonInclude(content=Include.NON_NULL)
+	@JsonInclude(Include.NON_EMPTY)
 	private long offset;
-	@JsonInclude(content=Include.NON_NULL)
+	@JsonInclude(Include.NON_EMPTY)
 	private long limit;
 }

@@ -117,12 +117,4 @@ public class TestParserResilience {
 		
 		assertTrue("Total kills in game should be 6", game.getTotalKills() == 7);
 	}
-	
-	public void test_log_empty() {
-		
-	}
-	
-	public void test_log_invalid_log() {
-		
-	}
 }

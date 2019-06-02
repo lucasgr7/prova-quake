@@ -1,6 +1,8 @@
 package com.luizalabs.provalabs.api.game;
 
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,7 +38,7 @@ public class GameController {
 		}else {
 			allGames = repo.findAll(offset, limit);
 		}
-		if(allGames == null || allGames.isEmpty()) {
+		if(allGames.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "game not found");
 		}
 		response.setRecords(allGames, offset, limit, repo.count());
@@ -45,11 +47,11 @@ public class GameController {
 	@GetMapping("games/{id}")
 	public ResponseBase getGame(@PathVariable(name="id",required = true) int id) {
 		ResponseBase response = new ResponseBase();
-		Game game = repo.getById(id);
-		if(game == null) {
+		Optional<Game> game = repo.getById(id);
+		if(!game.isPresent()) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "game not found");
 		}
-		response.setRecords(game);
+		response.setRecords(game.get());
 		return response;
 	}
 

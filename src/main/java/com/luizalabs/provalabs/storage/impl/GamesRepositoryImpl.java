@@ -51,8 +51,8 @@ public class GamesRepositoryImpl implements GamesRepository {
 		return allGames.subList(offset, offset+limit);
 	}
 	@Override
-	public Game getById(int id) {
-		return GamesRepositoryImpl.games.stream().filter(x -> x.getId() == id).findFirst().get();
+	public Optional<Game> getById(int id) {
+		return GamesRepositoryImpl.games.stream().filter(x -> x.getId() == id).findFirst();
 	}
 
 	@Override
