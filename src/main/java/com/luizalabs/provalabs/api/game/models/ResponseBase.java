@@ -7,8 +7,10 @@ import java.util.List;
 import com.luizalabs.provalabs.storage.entity.Game;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 @Data
+@Slf4j
 public class ResponseBase{
 
 	private Meta meta;
@@ -27,8 +29,7 @@ public class ResponseBase{
 		try {
 			this.meta.setHostname(InetAddress.getLocalHost().getHostName());
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(e.getMessage());
 		}
 	}
 	public void setRecords(Game game) {

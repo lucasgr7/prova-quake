@@ -40,11 +40,11 @@ public class QuakeLogParserImpl implements QuakeLogParser {
 		try {
 			String line = fileReader.nextLine();
 			while (line != null) {
-				log.info(line);
 				analyseLogLine(line.trim());
 				line = fileReader.nextLine();
 			}
 		} catch (Exception e) {
+			log.error(e.getMessage());
 			throw e;
 		} finally {
 			fileReader.close();
@@ -128,7 +128,7 @@ public class QuakeLogParserImpl implements QuakeLogParser {
 	}
 
 	private void createNewGame() {
-		QuakeLogParserImpl.GameInAnalisis = Game.builder().id(repo.count() + 1).players(new ArrayList<Player>())
+		QuakeLogParserImpl.GameInAnalisis = Game.builder().id(repo.count() + (long) 1).players(new ArrayList<Player>())
 				.build();
 	}
 

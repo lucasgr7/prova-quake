@@ -9,7 +9,10 @@ import org.springframework.stereotype.Component;
 
 import com.luizalabs.provalabs.service.QuakeLogParser;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class ApplicationStartup implements ApplicationListener<ApplicationReadyEvent> {
 
 	private String filepath;
@@ -25,7 +28,7 @@ public class ApplicationStartup implements ApplicationListener<ApplicationReadyE
         try {
 			logReader.parse(filepath);
 		} catch(Exception ex) {
-			ex.printStackTrace();
+			log.error(ex.getMessage());
 		}
 	}
 
