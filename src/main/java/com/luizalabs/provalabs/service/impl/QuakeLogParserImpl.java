@@ -26,7 +26,7 @@ public class QuakeLogParserImpl implements QuakeLogParser {
 	@Autowired
 	private LogReader fileReader;
 
-	private static Game gameState;
+	private Game gameState;
 
 	private static final String USER_WORLD = "<world>";
 	private static final String REGEX_PATTERN_END_GAME = "^.*\\d*:\\d*\\s(-*)$";
@@ -64,15 +64,15 @@ public class QuakeLogParserImpl implements QuakeLogParser {
 	}
 
 	private void finishGame(String line) throws CustomException {
-		if (QuakeLogParserImpl.gameState != null) {
-			repo.save(QuakeLogParserImpl.gameState);
-			QuakeLogParserImpl.gameState = null;
+		if (this.getGameState() != null) {
+			repo.save(this.getGameState());
+			this.setGameState(null);
 			log.info("FINISH GAME: " + line);
 		}
 	}
 
 	private void addPlayer(String line) {
-		Game game = QuakeLogParserImpl.gameState;
+		Game game = this.getGameState();
 
 		String[] bruteLogWords = line.split(" n\\\\");
 		String playerName = bruteLogWords[1].split("\\\\t")[0];
@@ -85,13 +85,13 @@ public class QuakeLogParserImpl implements QuakeLogParser {
 	}
 
 	private void addKill(String line) throws CustomException {
-		Game game = QuakeLogParserImpl.gameState;
-		game.setTotalKills(QuakeLogParserImpl.gameState.getTotalKills() + 1);
+		Game game = this.getGameState();
+		game.setTotalKills(game.getTotalKills() + 1);
 
-		Player killer = getPlayerFromLog(line, game, EnumPlayer.killer);
+		Player killer = getPlayerFromLog(line, EnumPlayer.KILLER);
 
 		if (USER_WORLD.equalsIgnoreCase(killer.getName())) {
-			Player dead = getPlayerFromLog(line, game, EnumPlayer.dead);
+			Player dead = getPlayerFromLog(line, EnumPlayer.DEAD);
 			dead.removeKill();
 			game.savePlayer(dead);
 		} else {
@@ -100,7 +100,7 @@ public class QuakeLogParserImpl implements QuakeLogParser {
 		}
 	}
 
-	private Player getPlayerFromLog(String line, Game game, EnumPlayer selectedPlayer) throws CustomException {
+	private Player getPlayerFromLog(String line, EnumPlayer selectedPlayer) throws CustomException {
 		String[] bruteLogWords = line.split("^\\d*:\\d*\\sKill:\\s\\d*\\s\\d*\\s\\d*:\\s");
 		String[] killedLog = bruteLogWords[1].split("\\skilled\\s(?!=killed\\sby)");
 		String killerPlayerName = killedLog[0].trim();
@@ -108,7 +108,7 @@ public class QuakeLogParserImpl implements QuakeLogParser {
 
 		String playerNameFiltered = killerPlayerName;
 
-		if (selectedPlayer == EnumPlayer.dead) {
+		if (selectedPlayer == EnumPlayer.DEAD) {
 			playerNameFiltered = deadPlayerName;
 		}
 		Optional<Player> player = findPlayer(playerNameFiltered);
@@ -122,17 +122,23 @@ public class QuakeLogParserImpl implements QuakeLogParser {
 	}
 
 	private Optional<Player> findPlayer(final String name) {
-		Optional<Player> player = QuakeLogParserImpl.gameState.getPlayers().stream()
+		return this.getGameState().getPlayers().stream()
 				.filter(x -> x.getName().equalsIgnoreCase(name)).findAny();
-		return player;
 	}
 
 	private void createNewGame() {
-		QuakeLogParserImpl.gameState = Game.builder().id(repo.count() + (long) 1).players(new ArrayList<Player>())
-				.build();
+		this.setGameState(Game.builder().id(repo.count() + (long) 1).players(new ArrayList<Player>())
+				.build());
+	}
+
+	private void setGameState(Game game) {
+		this.gameState = game;
+	}
+	private Game getGameState() {
+		return this.gameState;
 	}
 
 	public enum EnumPlayer {
-		dead, killer
+		DEAD, KILLER
 	}
 }

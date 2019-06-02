@@ -22,13 +22,12 @@ public class GamesRepositoryImpl implements GamesRepository {
 	
 	@Override
 	public List<Game> findAll() {
-		List<Game> allGames = GamesRepositoryImpl.games;
-		return allGames;
+		return getGames();
 	}
 	
 	@Override
 	public List<Game> findAll(Integer offset, Integer limit) {
-		List<Game> allGames = GamesRepositoryImpl.games;
+		List<Game> allGames = getGames();
 		return subList(offset, limit, allGames);
 	}
 
@@ -41,7 +40,7 @@ public class GamesRepositoryImpl implements GamesRepository {
 		}
 		int max = allGames.size();
 		if(offset > max) {
-			return null;
+			return new ArrayList<>();
 		}
 		if(limit > max) {
 			limit = max - offset;
@@ -87,7 +86,15 @@ public class GamesRepositoryImpl implements GamesRepository {
 
 	@Override
 	public void clearBase() {
-		GamesRepositoryImpl.games = new ArrayList<Game>();
+		setGames(new ArrayList<>());
+	}
+	
+	private static void setGames(List<Game> games) {
+		GamesRepositoryImpl.games = games;
+	}
+	
+	private List<Game> getGames() {
+		return GamesRepositoryImpl.games;
 	}
 
 
