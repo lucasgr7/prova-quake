@@ -43,6 +43,7 @@ public class QuakeLogParserImpl implements QuakeLogParser {
 				analyseLogLine(line.trim());
 				line = fileReader.nextLine();
 			}
+			finishGame();
 		} catch (CustomException e) {
 			log.error(e.getMessage());
 			throw e;
@@ -51,6 +52,16 @@ public class QuakeLogParserImpl implements QuakeLogParser {
 		}
 	}
 
+	/**
+	 * Using regex pattern recognition, it will detect if is a line of interest.
+	 * It will categirize as four possible outcomes for the line:
+	 * Start the game - It will create a new instance of object to store data from the next lines
+	 * Player Entered the game - Will add the players to a list of players in match
+	 * Kill - Retrieve the data of registered kill in the match
+	 * End game - Stores the object and wait to open a new instance.
+	 * @param line
+	 * @throws CustomException
+	 */
 	private void analyseLogLine(String line) throws CustomException {
 		if (line.matches(REGEX_PATTERN_START_GAME)) {
 			createNewGame();
@@ -59,18 +70,21 @@ public class QuakeLogParserImpl implements QuakeLogParser {
 		} else if (line.matches(REGEX_PATTERN_KILL)) {
 			addKill(line);
 		} else if (line.matches(REGEX_PATTERN_END_GAME)) {
-			finishGame(line);
+			finishGame();
 		}
 	}
 
-	private void finishGame(String line) throws CustomException {
+	private void finishGame() throws CustomException {
 		if (this.getGameState() != null) {
 			repo.save(this.getGameState());
 			this.setGameState(null);
-			log.info("FINISH GAME: " + line);
 		}
 	}
 
+	/**
+	 * Split the string to retrieve the players name from the log file
+	 * @param line
+	 */
 	private void addPlayer(String line) {
 		Game game = this.getGameState();
 
@@ -84,9 +98,16 @@ public class QuakeLogParserImpl implements QuakeLogParser {
 		}
 	}
 
+	/**
+	 * Read the data from the line, extract the dead player and the killer
+	 * Increment +1 to the killer's kill count.
+	 * In case the player died from the <world> (enviroment of the game) the dead's player kill count will be decremented
+	 * @param line
+	 * @throws CustomException
+	 */
 	private void addKill(String line) throws CustomException {
 		Game game = this.getGameState();
-		game.setTotalKills(game.getTotalKills() + 1);
+		game.setTotalKills(game.getTotalKills() + (long) 1);
 
 		Player killer = getPlayerFromLog(line, EnumPlayer.KILLER);
 
@@ -100,6 +121,13 @@ public class QuakeLogParserImpl implements QuakeLogParser {
 		}
 	}
 
+	/**
+	 * Retrieve both players from a "Kill:" log line.
+	 * @param line
+	 * @param selectedPlayer an enum to select each shall be returned (dead player or assassin player)
+	 * @return an object of the player
+	 * @throws CustomException
+	 */
 	private Player getPlayerFromLog(String line, EnumPlayer selectedPlayer) throws CustomException {
 		String[] bruteLogWords = line.split("^\\d*:\\d*\\sKill:\\s\\d*\\s\\d*\\s\\d*:\\s");
 		String[] killedLog = bruteLogWords[1].split("\\skilled\\s(?!=killed\\sby)");
@@ -126,6 +154,9 @@ public class QuakeLogParserImpl implements QuakeLogParser {
 				.filter(x -> x.getName().equalsIgnoreCase(name)).findAny();
 	}
 
+	/**
+	 * Create a new global object to stores the game to be worked untill reach the end in the log
+	 */
 	private void createNewGame() {
 		this.setGameState(Game.builder().id(repo.count() + (long) 1).players(new ArrayList<Player>())
 				.build());
