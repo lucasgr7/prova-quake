@@ -34,5 +34,9 @@ public class ResponseBase{
 	}
 	public void setRecords(Game game) {
 		this.records = Arrays.asList(game);
+		this.meta.setOffset(0);
+		this.meta.setLimit(1);
+		this.meta.setRecordsCount(1);
+		this.meta.setTotalRecords(1);
 	}
 }
