@@ -106,10 +106,10 @@ public class TestParserResilience {
 		assertTrue("Player isn't registered: " +PLAYER_TWO, game.getPlayers().stream().anyMatch(x -> x.getName().equalsIgnoreCase(PLAYER_TWO)));
 		assertTrue("Player isn't registered: " +PLAYER_THREE, game.getPlayers().stream().anyMatch(x -> x.getName().equalsIgnoreCase(PLAYER_THREE)));
 		assertTrue("Player isn't registered: " +PLAYER_FOUR, game.getPlayers().stream().anyMatch(x -> x.getName().equalsIgnoreCase(PLAYER_FOUR)));
-		Player player1 = game.getPlayers().get(0);
-		Player player2 = game.getPlayers().get(1);
-		Player player3 = game.getPlayers().get(2);
-		Player player4 = game.getPlayers().get(3);
+		Player player1 = game.getPlayers().stream().filter(x -> x.getName().equals(PLAYER_ONE)).findFirst().get();
+		Player player2 = game.getPlayers().stream().filter(x -> x.getName().equals(PLAYER_TWO)).findFirst().get();
+		Player player3 = game.getPlayers().stream().filter(x -> x.getName().equals(PLAYER_THREE)).findFirst().get();
+		Player player4 = game.getPlayers().stream().filter(x -> x.getName().equals(PLAYER_FOUR)).findFirst().get();
 		assertTrue("Player one should have 2 kills", player1.getKills() == 2);
 		assertTrue("Player two should have 2 kills", player2.getKills() == 2);
 		assertTrue("Player three should have 2 kills", player3.getKills() == 2);

@@ -52,7 +52,7 @@ public class TestGameControllerGET {
 	
 	private final int DEFAULT_OFFSET = 0, DEFAULT_LIMIT = 50;
 	
-	String PLAYER_ONE = "Abel", PLAYER_TWO = "Bain", PLAYER_THREE = "Cris evans", PLAYER_FOUR = "------------------";
+	String PLAYER_ONE = "Abel", PLAYER_TWO = "Bain", PLAYER_THREE = "Cris evans", PLAYER_FOUR = "z: ------------------";
 
 	@Before
 	public void init() {
