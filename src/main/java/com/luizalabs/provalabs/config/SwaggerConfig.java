@@ -1,7 +1,6 @@
 package com.luizalabs.provalabs.config;
 
 import java.util.Collections;
-import java.util.Properties;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
