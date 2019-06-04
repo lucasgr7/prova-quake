@@ -36,12 +36,12 @@ git clone https://github.com/lucasgr7/prova-quake.git
 Maven execute the app
 
 ```
-mvn exec:java
+mvn spring-boot:run
 ```
 
-Default port for the project is `80`
+Default port for the project is `8080`
 
-Access http://localhost you shall see the swagger page for the project
+Access http://localhost8080 you shall see the swagger page for the project
 
 
 
