@@ -16,6 +16,8 @@ import com.luizalabs.provalabs.api.game.models.ResponseBase;
 import com.luizalabs.provalabs.storage.GamesRepository;
 import com.luizalabs.provalabs.storage.entity.Game;
 
+import io.swagger.annotations.ApiOperation;
+
 @RestController
 public class GameController {
 
@@ -25,7 +27,8 @@ public class GameController {
 	@Autowired
 	private GamesRepository repo;
 
-	@GetMapping("games")
+	@GetMapping("/v1/games")
+	@ApiOperation(value = "Return the list of all the games data")
     @ResponseStatus(HttpStatus.OK)
 	public ResponseBase getAll(
 			@RequestParam(name="offset",defaultValue=DEFAULT_OFFSET,required = false) Integer offset, 
@@ -44,7 +47,8 @@ public class GameController {
 		response.setRecords(allGames, offset, limit, repo.count());
 		return response;
 	}
-	@GetMapping("games/{id}")
+	@GetMapping("v1/games/{id}")
+	@ApiOperation(value = "Return a single game by the id")
 	public ResponseBase getGame(@PathVariable(name="id",required = true) int id) {
 		ResponseBase response = new ResponseBase();
 		Optional<Game> game = repo.getById(id);
