@@ -110,10 +110,10 @@ public class TestParserResilience {
 		Player player2 = game.getPlayers().get(1);
 		Player player3 = game.getPlayers().get(2);
 		Player player4 = game.getPlayers().get(3);
-		assertTrue("Player one should have 2 kills", player1.getTotalKills() == 2);
-		assertTrue("Player two should have 2 kills", player2.getTotalKills() == 2);
-		assertTrue("Player three should have 2 kills", player3.getTotalKills() == 2);
-		assertTrue("Player four should have -1 kill", player4.getTotalKills() == -1);
+		assertTrue("Player one should have 2 kills", player1.getKills() == 2);
+		assertTrue("Player two should have 2 kills", player2.getKills() == 2);
+		assertTrue("Player three should have 2 kills", player3.getKills() == 2);
+		assertTrue("Player four should have -1 kill", player4.getKills() == -1);
 		
 		assertTrue("Total kills in game should be 6", game.getTotalKills() == 7);
 	}

@@ -3,20 +3,25 @@ package com.luizalabs.provalabs.storage.entity;
 import lombok.Data;
 
 @Data
-public class Player {
+public class Player implements Comparable<Player>{
 	private String name;
-	private int totalKills;
+	private int kills;
 	
 	public Player(String name) {
 		this.name = name;
-		this.totalKills = 0;
+		this.kills = 0;
 	}
 	
 	public void removeKill() {
-		this.totalKills -= 1;
+		this.kills -= 1;
 	}
 	
 	public void addKill() {
-		this.totalKills += 1;
+		this.kills += 1;
+	}
+	
+	@Override
+	public int compareTo(Player o) {
+		return this.getName().compareTo(o.getName());
 	}
 }

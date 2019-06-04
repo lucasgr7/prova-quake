@@ -217,10 +217,10 @@ public class TestGameControllerGET {
 		assertTrue("Game 1 should have returned 4 players", playersNames.size() == 4);
 		assertTrue("Game 1 sDidn't return all the players", playersNames.containsAll(allPlayers));
 		assertTrue(String.format("Returned %s expected %s", game.getTotalKills(), 5), game.getTotalKills() == 5);
-		assertTrue("Game 1 sPlayer 1 should have one kill registered", game.getPlayers().get(0).getTotalKills() == 1);
-		assertTrue("Game 1 sPlayer 2 should have one kill registered", game.getPlayers().get(1).getTotalKills() == 1);
-		assertTrue("Game 1 sPlayer 3 should have one kill registered", game.getPlayers().get(2).getTotalKills() == 1);
-		assertTrue("Game 1 sPlayer 4 should have zero kills registered", game.getPlayers().get(3).getTotalKills() == 0);
+		assertTrue("Game 1 sPlayer 1 should have one kill registered", game.getPlayers().get(0).getKills() == 1);
+		assertTrue("Game 1 sPlayer 2 should have one kill registered", game.getPlayers().get(1).getKills() == 1);
+		assertTrue("Game 1 sPlayer 3 should have one kill registered", game.getPlayers().get(2).getKills() == 1);
+		assertTrue("Game 1 sPlayer 4 should have zero kills registered", game.getPlayers().get(3).getKills() == 0);
 		return true;
 	}
 	public boolean isValidGame2(Game game) {
@@ -234,8 +234,8 @@ public class TestGameControllerGET {
 		Player abel = game.getPlayers().stream().filter(x -> x.getName().equalsIgnoreCase(PLAYER_ONE)).findAny().get();
 		Player bain = game.getPlayers().stream().filter(x -> x.getName().equalsIgnoreCase(PLAYER_TWO)).findAny().get();
 		
-		assertTrue("Game 2 Player 1 should have one kill registered", abel.getTotalKills() == 1);
-		assertTrue("Game 2 Player 2 should have none kill registered", bain.getTotalKills() == 0);
+		assertTrue("Game 2 Player 1 should have one kill registered", abel.getKills() == 1);
+		assertTrue("Game 2 Player 2 should have none kill registered", bain.getKills() == 0);
 		return true;
 	}
 
@@ -251,8 +251,8 @@ public class TestGameControllerGET {
 		Player abel = game.getPlayers().stream().filter(x -> x.getName().equalsIgnoreCase(PLAYER_ONE)).findAny().get();
 		Player bain = game.getPlayers().stream().filter(x -> x.getName().equalsIgnoreCase(PLAYER_TWO)).findAny().get();
 		
-		assertTrue("Game 3 Player 1 should have none kill registered", abel.getTotalKills() == 0);
-		assertTrue("Game 3 Player 2 should have one kill registered", bain.getTotalKills() == 1);
+		assertTrue("Game 3 Player 1 should have none kill registered", abel.getKills() == 0);
+		assertTrue("Game 3 Player 2 should have one kill registered", bain.getKills() == 1);
 		return true;
 	}
 }
